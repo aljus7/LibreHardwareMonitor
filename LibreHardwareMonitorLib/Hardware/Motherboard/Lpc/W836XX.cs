@@ -189,6 +189,22 @@ internal class W836XX : ISuperIO
     public void WriteGpio(int index, byte value)
     { }
 
+    public void WritePwm(int index, byte value)
+    {
+        if (index < 0 || index >= Controls.Length)
+            return;
+
+        SetControl(index, value);
+    }
+
+    public float? ReadFanRpm(int index)
+    {
+        if (index < 0 || index >= Fans.Length)
+            return null;
+
+        return Fans[index];
+    }
+
     public void SetControl(int index, byte? value)
     {
         if (index < 0 || index >= Controls.Length)

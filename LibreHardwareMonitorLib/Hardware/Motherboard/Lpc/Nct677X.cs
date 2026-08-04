@@ -651,6 +651,42 @@ internal class Nct677X : ISuperIO
     public void WriteGpio(int index, byte value)
     { }
 
+    /// <summary>
+    /// Sets the PWM value for a fan connected to a Nuvoton controller.
+    /// </summary>
+    /// <param name="index">The fan index (0-based)</param>
+    /// <param name="value">PWM value in 0-255 range</param>
+    public void WritePwm(int index, byte value)
+    {
+        if (!_isNuvotonVendor)
+            return;
+
+        if (index < 0 || index >= Controls.Length)
+            throw new ArgumentOutOfRangeException(nameof(index));
+
+        if (FAN_PWM_OUT_REG == null || index >= FAN_PWM_OUT_REG.Length)
+            return;
+
+        if (FAN_PWM_OUT_REG[index] == 0xFFF)
+            return;
+
+        // Use the existing SetControl method which handles all the chip-specific logic
+        SetControl(index, value);
+    }
+
+    /// <summary>
+    /// Reads the RPM value from a fan tachometer.
+    /// </summary>
+    /// <param name="index">The fan index (0-based)</param>
+    /// <returns>Fan speed in RPM, or null if not available</returns>
+    public float? ReadFanRpm(int index)
+    {
+        if (index < 0 || index >= Fans.Length)
+            return null;
+
+        return Fans[index];
+    }
+
     public void SetControl(int index, byte? value)
     {
         if (!_isNuvotonVendor)
